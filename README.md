@@ -1,143 +1,69 @@
 # AWS EC2 + NGINX Deployment Using Terraform
 
-A hands-on DevOps project to learn how to provision an AWS EC2 instance using Terraform and deploy an NGINX web server.
-
-This project combines AWS infrastructure provisioning, Infrastructure as Code (IaC), Linux administration, networking, IAM permissions, and web server deployment in one beginner-friendly, step-by-step lab.
-
-> **Current status:** Environment checks, AWS networking discovery, IAM permission preparation, and initial Terraform configuration are documented. EC2 provisioning and NGINX deployment are still in progress.
-
-## Table of Contents
-
-1. [Project Overview](#1-project-overview)
-2. [Problem Statement](#2-problem-statement)
-3. [Why We Need This Use Case](#3-why-we-need-this-use-case)
-4. [When We Need This Use Case](#4-when-we-need-this-use-case)
-5. [Tools and Technologies](#5-tools-and-technologies)
-6. [Prerequisites](#6-prerequisites)
-7. [Advantages and Disadvantages](#7-advantages-and-disadvantages)
-8. [Project Structure](#8-project-structure)
-9. [Step-by-Step Implementation](#9-step-by-step-implementation)
-10. [Security Considerations](#10-security-considerations)
-11. [Current Progress and Next Steps](#11-current-progress-and-next-steps)
-12. [Conclusion](#12-conclusion)
-
 ## 1. Project Overview
 
-The goal is to automate the provisioning of an AWS EC2 instance using Terraform and deploy NGINX to serve a basic web page.
+This project demonstrates how to prepare and deploy an AWS EC2 instance using Terraform and configure NGINX as a web server.
 
-Instead of creating all infrastructure manually through the AWS Console, Terraform will define the required resources in configuration files.
+The goal is to learn Infrastructure as Code (IaC), AWS resource management, and basic web server deployment through a practical, step-by-step project.
 
-Before creating any cloud resources, the project checks the local environment, AWS credentials, region, existing networking resources, and IAM permissions. This helps identify potential problems before deployment.
-
-### Planned workflow
-
-1. Verify Terraform and AWS CLI installation.
-2. Confirm the correct AWS profile and region.
-3. Inspect existing VPC networking and EC2 resources.
-4. Review security groups, key pairs, and instance type availability.
-5. Check IAM permissions required for deployment.
-6. Configure and validate Terraform.
-7. Review the Terraform execution plan.
-8. Provision the EC2 instance and dedicated security group.
-9. Install and configure NGINX.
-10. Verify the web page from a browser.
-11. Document troubleshooting and clean up the lab resources.
+**Current status:** Prerequisites, AWS environment discovery, IAM permission checks, and initial Terraform configuration are in progress. The EC2 instance and NGINX web server have not yet been deployed.
 
 ## 2. Problem Statement
 
-Deploying a web application on AWS requires creating and configuring cloud resources such as EC2 instances, networking, and security groups. Performing these tasks manually can take time and may lead to configuration errors.
+Creating AWS infrastructure manually through the AWS Management Console can take time and may lead to inconsistent configurations.
 
-This use case demonstrates how to prepare an AWS environment and use Terraform to automate EC2 provisioning, followed by deploying an NGINX web server.
+Terraform helps automate infrastructure provisioning by defining AWS resources in configuration files. This project uses Terraform to prepare a repeatable process for deploying an EC2 instance and hosting a basic web page using NGINX.
 
-The objective is to build a repeatable deployment process that beginners can understand, execute, verify, and document.
+## 3. Why Is This Project Needed?
 
-## 3. Why We Need This Use Case
+- To understand Infrastructure as Code using Terraform.
+- To practise AWS EC2 provisioning.
+- To understand AWS IAM permissions and security groups.
+- To learn how Terraform communicates with AWS.
+- To deploy a basic NGINX web server.
+- To practise validating, planning, applying, and destroying Terraform-managed infrastructure.
 
-- To understand how to launch and manage an AWS EC2 instance.
-- To learn Infrastructure as Code using Terraform.
-- To automate cloud resource provisioning.
-- To understand AWS profiles, IAM permissions, and security groups.
-- To practise Linux administration and web server deployment.
-- To understand basic AWS networking and internet connectivity.
-- To maintain infrastructure configuration using Git and GitHub.
-- To learn how to review infrastructure changes before applying them.
+## 4. When Can We Use This?
 
-## 4. When We Need This Use Case
+This approach is useful when:
 
-This approach is useful:
-
-- When hosting a basic web application on AWS.
-- When creating development or testing environments.
-- When learning AWS EC2 and Terraform.
-- When replacing repetitive manual infrastructure setup with automation.
-- When practising cloud deployment and basic DevOps workflows.
-- When building a portfolio project to demonstrate practical cloud skills.
+- Creating repeatable development or testing environments.
+- Automating virtual machine provisioning.
+- Deploying a basic web server.
+- Learning cloud infrastructure automation.
+- Building a foundation for larger DevOps projects.
 
 ## 5. Tools and Technologies
 
 | Tool | Purpose |
 |---|---|
-| AWS EC2 | Hosts the virtual machine |
-| Terraform | Defines and provisions infrastructure |
-| AWS CLI | Inspects AWS resources and verifies credentials |
-| AWS IAM | Controls identity and permissions |
-| Amazon VPC | Provides network isolation and connectivity |
-| Security Groups | Control inbound and outbound traffic |
-| Linux / Amazon Linux 2023 | Operating system for the EC2 instance |
-| NGINX | Serves the web page |
-| Git and GitHub | Version control and documentation |
-| WSL Ubuntu | Local development environment |
+| AWS | Cloud infrastructure |
+| Amazon EC2 | Virtual server |
+| Terraform | Infrastructure as Code |
+| AWS CLI | AWS access and environment verification |
+| IAM | Identity and access management |
+| Security Groups | Network traffic control |
+| NGINX | Web server |
+| Ubuntu on WSL | Local development environment |
+| Git and GitHub | Version control and project documentation |
 
 ## 6. Prerequisites
 
-Before starting, ensure that you have:
+Before creating any AWS resources, verify the following:
 
-- An AWS account.
+- An active AWS account.
+- AWS CLI installed.
 - Terraform installed.
-- AWS CLI installed and configured.
-- A working AWS profile with the required permissions.
-- WSL Ubuntu or another Linux terminal.
-- Git installed and a GitHub account.
-- Basic familiarity with Linux commands and AWS.
+- A working AWS CLI profile with appropriate permissions.
+- An AWS Region selected.
+- Existing VPC and subnet details checked.
+- Internet Gateway and route table verified.
+- EC2 instance type availability checked.
+- Existing key pair and local private key verified.
+- IAM permissions reviewed.
+- Terraform configuration and `.gitignore` prepared.
 
-### Environment used
-
-| Component | Configuration |
-|---|---|
-| Operating environment | WSL Ubuntu |
-| Cloud provider | AWS |
-| AWS region | `us-west-2` |
-| AWS CLI profile | `ec2-nginx-lab` |
-| Planned instance type | `t3.micro` |
-| Planned operating system | Amazon Linux 2023 |
-| Web server | NGINX |
-| Infrastructure as Code | Terraform |
-
-These are the intended lab settings. The EC2 instance and NGINX deployment have not yet been completed.
-
-## 7. Advantages and Disadvantages
-
-### Advantages
-
-- **Automation:** Terraform provisions infrastructure from configuration files.
-- **Consistency:** Configuration can be reused for repeatable deployments.
-- **Version control:** Infrastructure changes can be tracked using Git.
-- **Practical learning:** Combines AWS, Linux, networking, and Terraform.
-- **Reviewable changes:** `terraform plan` previews proposed changes.
-- **Resource management:** Terraform can manage and destroy resources created for the lab.
-
-### Disadvantages
-
-- **Learning curve:** Terraform syntax and AWS services require practice.
-- **Permission issues:** Incorrect IAM permissions can prevent deployment.
-- **Cost management:** Running AWS resources may incur charges.
-- **State management:** Terraform state must be protected.
-- **Security risks:** Incorrect security group rules can expose services.
-- **Troubleshooting:** Networking, credentials, and configuration errors can cause deployment failures.
-
-## 8. Project Structure
-
-The repository is being developed in stages. The intended structure is:
+## 7. Project Structure
 
 ```text
 terraform-aws-ec2-nginx/
@@ -179,246 +105,269 @@ terraform-aws-ec2-nginx/
     └── 3-2-create-a-.gitignore-file.png
 ```
 
-The Terraform files listed above represent the intended structure. Add each file as its implementation stage is completed. The screenshots listed above reflect the preparation steps documented so far.
+*Note: The structure shows the intended project files. Add files as you create them, and keep the screenshot filenames consistent with the actual files in your repository.*
 
-## 9. Step-by-Step Implementation
+## 8. Step-by-Step Implementation
 
-### Phase 1: Environment Prerequisites
+### Phase 1: Verify the Local Environment
 
-#### Step 1.1: Verify the working directory
+The first step is to confirm that the required tools are installed and that the terminal is using the correct project directory.
 
-The Terraform project is maintained separately from the manual EC2 + NGINX deployment project.
+#### Step 1.1: Check the current directory
+
+Command:
 
 ```bash
-cd ~/projects/terraform-aws-ec2-nginx
 pwd
 ```
 
-Verify that the output points to the correct project directory.
+![Current project directory](screenshots/1-1-current-directory.png)
 
-Screenshot: `screenshots/1-1-current-directory.png`
+#### Step 1.2: Check Terraform installation
 
-#### Step 1.2: Verify Terraform installation
+Command:
 
 ```bash
 terraform version
 ```
 
-Terraform is used to define and manage infrastructure through configuration files.
+![Check Terraform installation](screenshots/1-2-check-whether-terraform-is-installed.png)
 
-Screenshot: `screenshots/1-2-check-whether-terraform-is-installed.png`
+#### Step 1.3: Check AWS CLI installation
 
-#### Step 1.3: Verify AWS CLI installation
+Command:
 
 ```bash
 aws --version
 ```
 
-The AWS CLI allows us to inspect AWS resources and verify the active identity.
+![Check AWS CLI installation](screenshots/1-3-check-whether-aws-cli-is-installed.png)
 
-Screenshot: `screenshots/1-3-check-whether-aws-cli-is-installed.png`
+#### Step 1.4: Check the configured AWS Region
 
-#### Step 1.4: Check the configured AWS region
+Command:
 
 ```bash
 aws configure get region --profile ec2-nginx-lab
 ```
 
-The intended region is `us-west-2`, which corresponds to US West (Oregon).
+![Check the configured AWS Region](screenshots/1-4-check-which-aws-region-your-cli-currently-uses.png)
 
-Screenshot: `screenshots/1-4-check-which-aws-region-your-cli-currently-uses.png`
+#### Step 1.5: Inspect the credential source safely
 
-#### Step 1.5: Inspect credential configuration safely
+Check the configured credential source without printing secret access keys.
 
-Credential configuration was inspected without intentionally displaying the secret access key.
+![Inspect the credential source](screenshots/1-5-inspect-the-credential-source-without-revealing-the-secret-key.png)
 
-Never include access keys, secret keys, session tokens, or other credentials in public screenshots.
+#### Step 1.6: List available AWS CLI profiles
 
-Screenshot: `screenshots/1-5-inspect-the-credential-source-without-revealing-the-secret-key.png`
-
-#### Step 1.6: Check available AWS profiles
+Command:
 
 ```bash
 aws configure list-profiles
 ```
 
-Named profiles help select the intended AWS credentials and configuration.
+![List AWS CLI profiles](screenshots/1-6-check-which-named-profiles-exist.png)
 
-Screenshot: `screenshots/1-6-check-which-named-profiles-exist.png`
+#### Step 1.7: Test the AWS profiles
 
-#### Step 1.7: Test AWS profiles
+Test whether the selected profile can authenticate with AWS.
 
-The default profile did not authenticate successfully during the initial checks. The named lab profile was tested instead.
-
-Screenshot: `screenshots/1-7-test-each-aws-profile.png`
-
-#### Step 1.8: Verify the working profile
+Command:
 
 ```bash
 aws sts get-caller-identity --profile ec2-nginx-lab
 ```
 
-The `ec2-nginx-lab` profile successfully authenticated with AWS.
+![Test AWS profiles](screenshots/1-7-test-each-aws-profile.png)
 
-Screenshot: `screenshots/1-8-verify-the-working-aws-profile.png`
+#### Step 1.8: Verify the working AWS profile
 
-#### Step 1.9: Verify the region
+Confirm the identity associated with the profile.
+
+Command:
+
+```bash
+aws sts get-caller-identity --profile ec2-nginx-lab
+```
+
+![Verify the working AWS profile](screenshots/1-8-verify-the-working-aws-profile.png)
+
+#### Step 1.9: Verify the Region
+
+Command:
 
 ```bash
 aws configure get region --profile ec2-nginx-lab
 ```
 
-Confirm that the configured region is `us-west-2`.
+![Verify the AWS Region](screenshots/1-9-verify-the-region.png)
 
-Screenshot: `screenshots/1-9-verify-the-region.png`
+**Result:** Terraform and AWS CLI are installed, and the `ec2-nginx-lab` profile has been verified for AWS authentication.
 
-### Phase 2: AWS Environment Discovery
+### Phase 2: Discover Existing AWS Resources
 
-Before provisioning resources, inspect the existing AWS environment.
+Before provisioning infrastructure, inspect the existing AWS environment. This helps avoid unnecessary resources and prevents accidental changes to existing configurations.
 
-#### Step 2.1: Check permissions before creating resources
+#### Step 2.1: Check AWS permissions
 
-The goal is to identify permission gaps before attempting deployment.
+Review the available permissions before creating resources.
 
-Screenshot: `screenshots/2-1-check-aws-permissions-before-creating-resources.png`
+![Check AWS permissions](screenshots/2-1-check-aws-permissions-before-creating-resources.png)
 
 #### Step 2.2: Inspect existing subnets
+
+Command:
 
 ```bash
 aws ec2 describe-subnets \
   --profile ec2-nginx-lab \
-  --region us-west-2
+  --region us-west-2 \
+  --query 'Subnets[].{SubnetId:SubnetId,AZ:AvailabilityZone,CIDR:CidrBlock,Default:DefaultForAz}' \
+  --output table
 ```
 
-Existing subnets were inspected to understand available networking options.
+![Inspect existing subnets](screenshots/2-2-check-existing-subnets.png)
 
-Screenshot: `screenshots/2-2-check-existing-subnets.png`
+#### Step 2.3: Verify the Internet Gateway
 
-#### Step 2.3: Verify the internet gateway
+Command:
 
 ```bash
 aws ec2 describe-internet-gateways \
   --profile ec2-nginx-lab \
-  --region us-west-2
+  --region us-west-2 \
+  --query 'InternetGateways[].{GatewayId:InternetGatewayId,VPCs:Attachments[].VpcId}' \
+  --output table
 ```
 
-The existing internet gateway and its attachment were inspected to understand the VPC's internet connectivity.
+![Check the Internet Gateway](screenshots/2-3-check-the-internet-gateway.png)
 
-Screenshot: `screenshots/2-3-check-the-internet-gateway.png`
+#### Step 2.4: Inspect the default route table
 
-#### Step 2.4: Verify the route table
+Command:
 
 ```bash
 aws ec2 describe-route-tables \
   --profile ec2-nginx-lab \
-  --region us-west-2
+  --region us-west-2 \
+  --query 'RouteTables[].{RouteTableId:RouteTableId,VPC:VpcId,Routes:Routes[].{Destination:DestinationCidrBlock,Gateway:GatewayId}}' \
+  --output json
 ```
 
-The route table was checked to understand the existing routes.
-
-Screenshot: `screenshots/2-4-check-the-default-route-table.png`
+![Check the default route table](screenshots/2-4-check-the-default-route-table.png)
 
 #### Step 2.5: Check EC2 permissions
 
-An initial permission check did not provide the expected output, so additional discovery and permission checks were performed.
+Verify the permissions needed to inspect and manage EC2 resources.
 
-Screenshot: `screenshots/2-5-check-ec2-permissions-no-output.png`
+![Check EC2 permissions](screenshots/2-5-check-ec2-permissions-no-output.png)
 
 #### Step 2.6: Check security group permissions
 
-Security group permissions were reviewed before creating or changing security rules.
+Confirm the available permissions for security group operations.
 
-Screenshot: `screenshots/2-6-check-security-group-permissions.png`
+![Check security group permissions](screenshots/2-6-check-security-group-permissions.png)
 
 #### Step 2.7: Inspect existing security group rules
 
-Existing inbound and outbound rules were inspected to avoid unintentionally changing shared networking configuration.
+Command:
 
-Screenshot: `screenshots/2-7-inspect-the-existing-security-group-rules.png`
+```bash
+aws ec2 describe-security-groups \
+  --profile ec2-nginx-lab \
+  --region us-west-2 \
+  --output table
+```
 
-#### Step 2.8: Check EC2 key pairs
+![Inspect existing security group rules](screenshots/2-7-inspect-the-existing-security-group-rules.png)
+
+#### Step 2.8: Check existing EC2 key pairs
+
+Command:
 
 ```bash
 aws ec2 describe-key-pairs \
   --profile ec2-nginx-lab \
-  --region us-west-2
+  --region us-west-2 \
+  --output table
 ```
 
-An existing key pair, `ec2-nginx-lab-key`, was found. The existing key was checked before deciding whether another key pair was necessary.
-
-Screenshot: `screenshots/2-8-check-ec2-key-pairs.png`
+![Check existing EC2 key pairs](screenshots/2-8-check-ec2-key-pairs.png)
 
 #### Step 2.9: Verify the local private key
 
-The existing local private key was checked.
+Check that the existing private key file is available and has restrictive permissions.
 
-Private keys must never be committed to GitHub or shared publicly.
+Command:
 
-Screenshot: `screenshots/2-9-verify-the-local-private-key.png`
+```bash
+ls -l ~/.ssh/ec2-nginx-lab-key.pem
+```
 
-#### Step 2.10: Verify instance type availability
+![Verify the local private key](screenshots/2-9-verify-the-local-private-key.png)
 
-The `t3.micro` instance type was checked for availability in the selected region and availability zones.
+Never upload the private key to GitHub or include it in screenshots.
 
-Screenshot: `screenshots/2-10-verify-the-ec2-instance-type-is-available.png`
+#### Step 2.10: Verify EC2 instance type availability
+
+Check whether the intended instance type is offered in the selected Region and Availability Zone.
+
+![Verify instance type availability](screenshots/2-10-verify-the-ec2-instance-type-is-available.png)
 
 #### Step 2.11: Check access to IAM information
 
-An IAM inspection command was denied. This demonstrated that the lab user has limited permissions for some IAM operations.
+Some IAM inspection operations may be restricted for the lab user. Check permissions without assuming that the user can inspect every IAM setting.
 
-Screenshot: `screenshots/2-11-check-whether-you-can-inspect-your-own-iam-permissions.png`
+![Check IAM inspection permissions](screenshots/2-11-check-whether-you-can-inspect-your-own-iam-permissions.png)
 
 #### Step 2.12: Retest instance type discovery
 
-Instance type discovery was retested after the required discovery permission was addressed.
+![Retest instance type discovery](screenshots/2-12-retest-instance-type-discovery.png)
 
-Screenshot: `screenshots/2-12-retest-instance-type-discovery.png`
+#### Step 2.13: Verify deployment permissions
 
-### Phase 3: IAM Permission Preparation
+Review the permissions needed to deploy the lab resources.
 
-#### Step 3.1: Review EC2 deployment permissions
+![Verify EC2 deployment permissions](screenshots/2-13-verify-the-ec2-deployment-permissions.png)
 
-The deployment policy was reviewed for permissions required to create and manage the lab resources.
+#### Step 2.14: Verify instance creation permissions
 
-Screenshot: `screenshots/2-13-verify-the-ec2-deployment-permissions.png`
+Check whether the configured IAM policy permits the required EC2 creation operations.
 
-#### Step 3.2: Check EC2 instance creation permissions
+![Verify instance creation permissions](screenshots/2-14-verify-ec2-instance-creation-permissions.png)
 
-The IAM Policy Simulator reported `Allowed` for the tested `ec2:RunInstances` action across the selected subnet, image, instance, network interface, and security group resource types.
+#### Step 2.15: Identify remaining permission gaps
 
-This is a useful permission check, but it does not guarantee that every Terraform operation will succeed.
+Identify missing permissions before moving to resource creation.
 
-Screenshot: `screenshots/2-14-verify-ec2-instance-creation-permissions.png`
+![Identify permission gaps](screenshots/2-15-identify-the-remaining-permission-gaps.png)
 
-#### Step 3.3: Identify remaining permission gaps
+#### Step 2.16: Update the deployment policy
 
-The deployment policy was reviewed for additional permissions that may be needed for resource creation and tagging.
+The deployment policy was updated to include `ec2:CreateTags`, which is commonly needed when Terraform creates or tags AWS resources.
 
-Screenshot: `screenshots/2-15-identify-the-remaining-permission-gaps.png`
+![Update the deployment policy](screenshots/2-16-update-the-deployment-policy-add-ec2-createtags.png)
 
-#### Step 3.4: Update the deployment policy
+#### Step 2.17: Verify AWS credentials again
 
-The `EC2-NGINX-Lab-Deployment` policy was updated to include `ec2:CreateTags`.
-
-The complete set of deployment permissions still needs to be validated against the finished Terraform configuration.
-
-Screenshot: `screenshots/2-16-update-the-deployment-policy-add-ec2-createtags.png`
-
-#### Step 3.5: Verify AWS credentials
+Command:
 
 ```bash
 aws sts get-caller-identity --profile ec2-nginx-lab
 ```
 
-This read-only command successfully returned the active AWS identity, confirming that the intended profile can authenticate.
+![Verify AWS credentials](screenshots/2-17-verify-the-aws-credentials.png)
 
-Screenshot: `screenshots/2-17-verify-the-aws-credentials.png`
+**Result:** The existing VPC, subnets, Internet Gateway, route table, key pair, and security group configuration have been inspected. The deployment policy has been updated. The existing default security group will not be modified; a dedicated security group should be created for this project.
 
-### Phase 4: Terraform Configuration
+### Phase 3: Configure Terraform
 
-#### Step 4.1: Configure the AWS provider
+Terraform must use the intended AWS profile and Region.
 
-Create or verify `versions.tf` in the project directory:
+#### Step 3.1: Configure the AWS provider
+
+Create `versions.tf` with the following configuration:
 
 ```hcl
 terraform {
@@ -438,202 +387,208 @@ provider "aws" {
 }
 ```
 
-This configuration specifies the Terraform version requirement, AWS provider version constraint, region, and intended AWS profile.
+![Configure Terraform AWS profile](screenshots/3-1-configure-terraform-to-use-the-correct-aws-profile.png)
 
-Screenshot: `screenshots/3-1-configure-terraform-to-use-the-correct-aws-profile.png`
+This configuration tells Terraform which AWS provider version to use and which profile and Region to select.
 
-#### Step 4.2: Create the `.gitignore` file
+#### Step 3.2: Create a `.gitignore` file
 
-Create or verify `.gitignore`:
+Create `.gitignore` to prevent Terraform-generated files, local secrets, and state files from being committed.
+
+Example:
 
 ```gitignore
+# Terraform working directory
 .terraform/
+
+# Terraform state
 *.tfstate
 *.tfstate.*
-*.tfplan
+crash.log
+crash.*.log
+
+# Variable files that may contain secrets
 *.tfvars
 *.tfvars.json
-.env
+
+# Local override files
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# Private keys and environment files
 *.pem
 *.key
-crash.log
+.env
 ```
 
-These rules help prevent generated Terraform data, local variable files, and private credentials from being committed.
+![Create the gitignore file](screenshots/3-2-create-a-.gitignore-file.png)
 
-Review the file before committing.
+**Important:** `.gitignore` prevents new untracked files from being added accidentally, but it does not remove files that are already tracked by Git. Never commit AWS credentials, private keys, or sensitive Terraform state.
 
-Screenshot: `screenshots/3-2-create-a-.gitignore-file.png`
+### Phase 4: Define the Infrastructure
 
-#### Step 4.3: Initialize Terraform
+This phase will define the AWS resources in Terraform files.
 
-After the required configuration files are ready, run:
+Planned files:
+
+- `main.tf` — EC2 instance and dedicated security group configuration.
+- `variables.tf` — configurable values such as instance type and allowed SSH source.
+- `outputs.tf` — useful values such as the instance public IP and website URL.
+- `user_data.sh` — startup script to install and start NGINX.
+
+The configuration should use a current Amazon Linux 2023 AMI discovered from AWS rather than relying on an outdated hard-coded AMI ID.
+
+**Status:** The infrastructure definition and resource deployment are still pending.
+
+### Phase 5: Initialize and Validate Terraform
+
+After the configuration files have been created, run the following commands in order.
+
+Initialize Terraform:
 
 ```bash
 terraform init
 ```
 
-This initializes the working directory and downloads the required provider.
+Check formatting:
 
-Verify that initialization completes successfully before proceeding.
+```bash
+terraform fmt -check
+```
 
-#### Step 4.4: Validate the configuration
+Validate the configuration:
 
 ```bash
 terraform validate
 ```
 
-This checks whether the Terraform configuration is syntactically valid and internally consistent.
-
-#### Step 4.5: Review the Terraform plan
+Review the proposed changes:
 
 ```bash
 terraform plan
 ```
 
-Review the proposed changes before creating any AWS resources. Do not apply the configuration until the planned resources, security rules, and permissions have been checked.
+Inspect the plan before applying it. Do not create resources until the planned instance, security group, network settings, and permissions have been reviewed.
 
-### Phase 5: Provision the EC2 Instance
+### Phase 6: Deploy EC2 and NGINX
 
-#### Step 5.1: Define the required resources
-
-The planned Terraform configuration will define:
-
-- An EC2 instance.
-- A dedicated security group for the lab.
-- The selected VPC and subnet.
-- An appropriate Amazon Linux 2023 AMI.
-- A startup script to install and configure NGINX.
-- Outputs needed to verify access to the deployed web server.
-
-The existing default VPC and shared security group should not be modified unnecessarily.
-
-#### Step 5.2: Create the infrastructure
-
-Once the configuration, IAM permissions, and plan have been verified, run:
+After the plan is reviewed and approved, deploy the resources:
 
 ```bash
 terraform apply
 ```
 
-Review the proposed changes and confirm only when the resources are correct.
+Read the proposed actions and type `yes` only if they match the intended configuration.
 
-**This step is planned and has not yet been completed.**
+The planned deployment should:
 
-### Phase 6: Install and Configure NGINX
+1. Create a dedicated security group.
+2. Allow SSH only from an explicitly configured trusted source IP.
+3. Allow HTTP traffic on port `80` for the web server.
+4. Launch the EC2 instance in the selected VPC and subnet.
+5. Install and start NGINX through the startup script.
+6. Output the instance public IP and website URL.
 
-The NGINX installation will be performed using a startup script or commands appropriate for the selected Amazon Linux operating system.
+Avoid opening SSH to `0.0.0.0/0`. Only permit HTTP from the internet if a publicly accessible demo website is intended.
 
-The deployment should:
+### Phase 7: Verify the Deployment
 
-1. Install NGINX.
-2. Enable the service.
-3. Start the service.
-4. Make a basic web page available.
-5. Verify that the service is running.
+After Terraform reports a successful deployment, verify the instance and web server.
 
-For a manual service check after connecting to the instance:
+Check Terraform outputs:
 
 ```bash
-sudo systemctl status nginx
+terraform output
 ```
 
-This command should show NGINX as active once the installation and startup are successful.
+Check the EC2 instance state:
 
-**The NGINX deployment is planned and has not yet been completed.**
+```bash
+aws ec2 describe-instances \
+  --profile ec2-nginx-lab \
+  --region us-west-2 \
+  --query 'Reservations[].Instances[].{InstanceId:InstanceId,State:State.Name,PublicIP:PublicIpAddress}' \
+  --output table
+```
 
-### Phase 7: Verify the Web Page
-
-After the instance is running:
-
-1. Retrieve the public IP address from the Terraform output or AWS Console.
-2. Confirm that the instance has suitable network connectivity.
-3. Verify that the security group permits inbound HTTP traffic on port 80.
-4. Open the following address in a browser, replacing the placeholder with the actual public IP:
+Open the website using the public IP or URL returned by Terraform:
 
 ```text
 http://<EC2-PUBLIC-IP>
 ```
 
-5. Confirm that the NGINX welcome page or deployed web page appears.
-
-A successful browser response will demonstrate that the instance, web server, and required network access are working together.
-
-**The web page has not yet been verified.**
+If the page does not load, check the instance state, security group inbound rules, subnet route, public IP assignment, and NGINX service logs before making changes.
 
 ### Phase 8: Clean Up Resources
 
-When the lab is complete, review the resources managed by this Terraform configuration.
-
-Preview the destruction plan:
+When the lab is complete and you no longer need the infrastructure, review what Terraform plans to delete:
 
 ```bash
 terraform plan -destroy
 ```
 
-If the proposed changes are correct and the resources are no longer needed, run:
+If the plan only includes the intended lab resources, run:
 
 ```bash
 terraform destroy
 ```
 
-Review the proposed destruction before confirming it.
+Review the proposed actions and type `yes` to confirm.
 
-Do not delete shared networking resources or resources outside the scope of this project.
+Do not delete the existing VPC, shared network resources, or existing key pair unless you have explicitly decided they are no longer needed. The lab should only remove the resources managed for this project.
 
-## 10. Security Considerations
+## 9. Advantages and Disadvantages
 
-- Use the intended AWS profile explicitly.
-- Never publish access keys, secret keys, session tokens, or private keys.
-- Never commit private keys, Terraform state, or sensitive variable files to GitHub.
-- Avoid changing the default VPC and shared security group unnecessarily.
-- Use a dedicated security group for the lab.
-- Allow only the inbound ports required for the demonstration.
-- Restrict SSH access to a trusted source IP when SSH is needed; avoid opening it to the entire internet.
-- Review IAM permissions and the Terraform plan before provisioning resources.
-- Use the minimum permissions necessary for the deployment.
-- Monitor AWS usage and costs.
-- Destroy lab resources when they are no longer required.
+### Advantages
 
-## 11. Current Progress and Next Steps
+- Repeatable infrastructure provisioning.
+- Version-controlled infrastructure configuration.
+- Less manual work in the AWS Console.
+- Easier review of planned changes before deployment.
+- Practical experience with Terraform, AWS IAM, EC2, and NGINX.
 
-### Completed so far
+### Disadvantages
 
-- Verified the local working directory.
-- Checked Terraform and AWS CLI installation.
-- Identified a working AWS named profile.
-- Verified the intended AWS region.
-- Inspected existing VPC networking, subnets, internet gateway, and route table.
-- Inspected security groups and existing EC2 key pairs.
-- Checked instance type availability.
-- Reviewed EC2 deployment permissions.
-- Updated the lab deployment policy to include `ec2:CreateTags`.
-- Verified AWS identity using STS.
-- Began preparing the Terraform provider configuration and `.gitignore`.
+- Incorrect permissions can block deployment.
+- Misconfigured network rules can expose services.
+- Terraform state must be protected.
+- AWS resources can incur charges while running.
+- A successful Terraform deployment does not automatically guarantee that the application is reachable.
 
-### Remaining steps
+## 10. Current Progress
 
-- Verify `versions.tf` and `.gitignore`.
-- Complete the Terraform resource configuration.
-- Initialize and validate Terraform.
-- Confirm all required AWS permissions.
-- Review the Terraform execution plan.
-- Provision the EC2 instance and dedicated security group.
-- Install and verify NGINX.
-- Test the web page from a browser.
-- Capture deployment screenshots and document troubleshooting.
-- Review and execute cleanup when the lab is complete.
+Completed or checked:
 
-> **Project status:** This project is still in the preparation and configuration stage. EC2 provisioning, NGINX deployment, and browser verification will be documented after they have been successfully completed.
+- [x] Verified the local project directory.
+- [x] Verified Terraform installation.
+- [x] Verified AWS CLI installation.
+- [x] Verified the working AWS CLI profile.
+- [x] Confirmed the intended AWS Region.
+- [x] Inspected existing VPC networking resources.
+- [x] Inspected existing security group rules.
+- [x] Verified the existing EC2 key pair and local private key.
+- [x] Checked instance type availability.
+- [x] Reviewed and updated the EC2 deployment permissions.
+- [x] Prepared the initial Terraform provider configuration.
+- [x] Prepared the `.gitignore` file.
 
-## 12. Conclusion
+Pending:
 
-This hands-on use case brings together AWS EC2, Terraform, IAM, networking, Linux, and NGINX in one practical DevOps project.
+- [ ] Complete the Terraform configuration.
+- [ ] Run Terraform initialization and validation.
+- [ ] Review the Terraform plan.
+- [ ] Create the dedicated security group and EC2 instance.
+- [ ] Install and verify NGINX.
+- [ ] Test the website in a browser.
+- [ ] Capture deployment evidence.
+- [ ] Clean up the lab resources when finished.
 
-The project begins with environment and permission checks before moving to infrastructure provisioning. Each stage will be documented with commands, verification steps, and screenshots so that beginners can follow the process and understand not only what to do, but also why each step is necessary.
+## 11. Conclusion
 
-The final goal is a repeatable Terraform deployment of an AWS EC2 instance serving a web page through NGINX, together with a documented verification and cleanup process.
+This project follows a cautious, step-by-step approach to AWS infrastructure automation. It begins with environment verification and permission checks before progressing to Terraform configuration and deployment.
 
----
+The objective is not only to launch an EC2 instance, but also to understand how Terraform, AWS IAM, networking, security groups, and NGINX work together in a basic cloud deployment.
 
-*Built as a hands-on learning project to practise AWS, Terraform, Linux, infrastructure automation, security, and DevOps documentation.*
+The project will be marked complete after the infrastructure is deployed, the NGINX website is verified, and the final evidence is documented.
