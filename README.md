@@ -157,7 +157,68 @@ The same approach can later be extended to:
 
 ---
 
-## 5. Tools and Technologies
+## 5. Learning Path: Manual AWS Deployment to Terraform Automation
+
+This Terraform project is the next step after understanding how to deploy an EC2 instance and configure NGINX manually on AWS.
+
+If you are new to AWS, I recommend completing the manual deployment project first.
+
+### Project 1: Manual AWS EC2 + NGINX Deployment
+
+**Repository:** [AWS EC2 + NGINX Web Application Deployment](https://github.com/withmalathi/aws-ec2-nginx-deployment)
+
+In this project, you learn how to:
+
+- Explore an existing AWS VPC and its subnets.
+- Understand Internet Gateways and route tables.
+- Inspect Network ACLs and security groups.
+- Identify an appropriate Amazon Linux AMI.
+- Check EC2 instance type availability.
+- Understand public IP assignment.
+- Configure security group access.
+- Launch an EC2 instance manually.
+- Install and configure NGINX.
+- Deploy and verify a custom web application.
+- Troubleshoot connectivity and application issues.
+- Clean up the AWS resources created during the lab.
+
+### Project 2: Terraform AWS EC2 + NGINX Deployment
+
+**Repository:** [Terraform AWS EC2 + NGINX](https://github.com/withmalathi/terraform-aws-ec2-nginx)
+
+In this project, you learn how to:
+
+- Define AWS infrastructure using Terraform.
+- Configure the AWS provider.
+- Discover existing AWS resources using Terraform data sources.
+- Create an EC2 instance and security group using Terraform.
+- Deploy NGINX using EC2 user data.
+- Review Terraform plans before provisioning.
+- Manage infrastructure using Terraform state.
+- Troubleshoot Terraform deployment issues.
+- Destroy resources safely using Terraform.
+
+### How are these projects connected?
+
+#### Project 1 — Manual deployment
+Learn and inspect AWS infrastructure
+- The manual project helps you understand the AWS infrastructure and the resources involved.
+<img width="1774" height="887" alt="image" src="https://github.com/user-attachments/assets/3d683c76-70e2-45f2-92a4-73d37b00d11a" />
+- VPC · Subnet · Internet Gateway · Route table · Security group · EC2 · NGINX
+
+#### Project 2 — Terraform automation
+
+Automate selected infrastructure resources
+- The Terraform project takes that understanding further by automating the creation and management of selected resources.
+ <img width="1244" height="700" alt="image" src="https://github.com/user-attachments/assets/6d9ccf71-b91b-4cf6-bc51-bc7b39708de1" />
+
+- Terraform provider · Data sources · Security group · EC2 · NGINX · State
+  
+**Important:** Completing Project 1 is recommended for learning, but it is not a technical requirement for running Project 2. You can start directly with Terraform if you already understand AWS networking and have the required existing resources in your account.
+
+If you start directly with Terraform, follow the AWS environment discovery and verification instructions in Section 6 before provisioning.
+
+## 5.1 Tools and Technologies
 
 | Tool / Technology | Purpose |
 |---|---|
@@ -182,6 +243,16 @@ The same approach can later be extended to:
 ## 6. Prerequisites
 
 Before creating AWS resources, prepare the local environment and verify the AWS account and permissions.
+
+```
+**Important: Follow this section in order**
+
+This project is documented using the environment and AWS configuration used during my implementation. You can follow the same steps using your own AWS account and local environment.
+
+Some values, such as the AWS CLI profile name, Region, VPC, subnet, and key pair, may differ in your account. Replace project-specific values with your own verified values wherever required.
+
+**Installing the tools does not create AWS resources.** The actual resource creation happens later when Terraform commands are executed.
+```
 
 ### 6.1 Accounts and access required
 
@@ -318,6 +389,10 @@ Configure your own profile:
 aws configure --profile ec2-nginx-lab
 ```
 
+**Note: For users with a different profile name:**
+
+If you choose a different profile name, replace `ec2-nginx-lab` with your chosen profile name in all subsequent AWS CLI commands and in the Terraform provider configuration in `versions.tf`.
+
 AWS CLI will request:
 
 ```text
@@ -386,6 +461,12 @@ aws configure list-profiles
 
 Having Terraform and AWS CLI installed does not automatically mean that the environment is ready to deploy.
 
+**Important distinction:**
+
+The following checks are preparation and verification steps. They do not create or modify AWS resources.
+
+This project reuses existing AWS networking resources rather than creating a new VPC, subnet, Internet Gateway, or route table. Verify that the resources required by the Terraform configuration exist in your account before proceeding.
+
 Before creating resources, verify:
 
 - [ ] AWS account is active.
@@ -405,6 +486,16 @@ Before creating resources, verify:
 - [ ] `.gitignore` is configured.
 - [ ] SSH access is restricted to a trusted source IP.
 - [ ] The Terraform plan has been reviewed before deployment.
+
+**Where can I learn these AWS networking concepts?**
+
+If you have not completed the manual AWS EC2 + NGINX project, refer to its [AWS resource discovery and verification guide](https://github.com/withmalathi/aws-ec2-nginx-deployment).
+
+It explains how to inspect the VPC, subnet, Internet Gateway, route table, Network ACL, security groups, AMI, EC2 instance type, and key-pair configuration.
+
+You can use that project as a reference without deploying another EC2 instance.
+
+Alternatively, if you are already familiar with AWS, perform the required discovery checks directly in your own AWS account before continuing.
 
 ### 6.10 Environment used in this project
 
@@ -426,6 +517,25 @@ Before creating resources, verify:
 **Important:** The AWS CLI profile is explicitly configured in the Terraform provider. If you use a different profile name or Region, update `versions.tf` and the corresponding AWS CLI commands throughout this README.
 
 This project reuses an existing default VPC, subnet, Internet Gateway, route table, and key pair. If your AWS account does not have suitable networking resources, you must create or adapt the networking configuration before deploying.
+
+### 6.11 Project-specific configuration versus your AWS account
+
+The environment table above records the configuration used during my implementation. These values are provided as a reference, not as universal values for every AWS account.
+
+Before running Terraform, review the following:
+
+| Configuration | What you should do |
+|---|---|
+| AWS CLI profile | Use your configured profile or update `versions.tf`. |
+| AWS Region | Use the Region where your required resources are available. |
+| VPC and subnet | Verify that your account has suitable existing networking resources. |
+| Availability Zone | Ensure the selected subnet and EC2 instance type are compatible. |
+| EC2 key pair | Use a key pair available in your selected Region. |
+| Private key | Ensure you have the corresponding local private key and protect it. |
+| SSH source IP | Restrict SSH access to your own trusted public IP using `/32`. |
+| Instance type | Confirm that the selected instance type is available in your chosen Availability Zone. |
+
+**Before proceeding:** Do not copy the resource IDs, IP addresses, or key-pair names from this README and assume they exist in your AWS account. Discover and verify your own resources first.
 
 ---
 
