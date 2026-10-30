@@ -192,21 +192,194 @@ The same approach can later be extended to:
 
 ## 6. Prerequisites
 
-Before creating AWS resources, verify the following:
+Before starting this project, make sure you have access to an AWS account and a local development environment where you can install and run Terraform and AWS CLI.
 
-- An active AWS account.
-- AWS CLI installed.
+**Don't have Terraform or AWS CLI installed? No problem!** Follow the installation steps below before proceeding with the project.
+
+### 6.1 Account and software requirements
+
+| Requirement | Purpose | Required before starting? |
+|---|---|---|
+| AWS account | Provides access to AWS cloud services. | Yes |
+| WSL Ubuntu / Linux / macOS / Windows environment | Provides a terminal to execute commands. | Yes |
+| AWS CLI | Allows you to interact with AWS from the terminal. | Yes, install before AWS configuration |
+| Terraform | Automates AWS infrastructure provisioning. | Yes, install before Terraform commands |
+| AWS IAM user or role | Provides permissions to access and manage AWS resources. | Yes |
+| Git | Helps manage and version-control the project. | Recommended |
+| GitHub account | Allows you to store and share the project repository. | Optional for local execution |
+
+### 6.2 Install the required tools
+
+If Terraform or AWS CLI is not installed on your system, install them first.
+
+#### A. Install AWS CLI
+
+AWS CLI allows you to interact with AWS services from your terminal.
+
+For Ubuntu / WSL Ubuntu, follow the official AWS installation instructions:
+
+https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html
+
+After installation, verify it:
+
+```bash
+aws --version
+```
+
+Expected output format:
+
+```text
+aws-cli/2.x.x Python/3.x.x Linux/...
+```
+
+The exact version and additional details may differ.
+
+#### B. Install Terraform
+
+Terraform is used to define and provision AWS infrastructure through configuration files.
+
+For Ubuntu / WSL Ubuntu, follow the official HashiCorp installation instructions:
+
+https://developer.hashicorp.com/terraform/install
+
+After installation, verify it:
+
+```bash
+terraform version
+```
+
+Expected output format:
+
+```text
+Terraform vX.Y.Z
+```
+
+The version may differ depending on when you install it.
+
+#### C. Install Git (if not already installed)
+
+Git is used for version control.
+
+```bash
+git --version
+```
+
+If Git is not installed on Ubuntu:
+
+```bash
+sudo apt update
+sudo apt install git -y
+```
+
+Verify again:
+
+```bash
+git --version
+```
+
+### 6.3 Configure AWS CLI credentials
+
+Once AWS CLI is installed, configure an AWS profile.
+
+For this project, the profile used is:
+
+```text
+ec2-nginx-lab
+```
+
+Configure your own credentials using:
+
+```bash
+aws configure --profile ec2-nginx-lab
+```
+
+AWS CLI prompts for:
+
+- AWS Access Key ID
+- AWS Secret Access Key
+- Default Region Name
+- Default Output Format
+
+For this project, the Region is:
+
+```text
+us-west-2
+```
+
+For output format, you can enter:
+
+```text
+json
+```
+
+**Security note:** Never share your access keys or commit AWS credentials to GitHub. For production environments, prefer IAM roles or another supported temporary credential mechanism instead of long-lived access keys.
+
+### 6.4 Verify your environment before proceeding
+
+After installation and configuration, verify that the required tools and AWS access are working.
+
+#### Check Terraform
+
+```bash
+terraform version
+```
+
+#### Check AWS CLI
+
+```bash
+aws --version
+```
+
+#### Check the configured AWS profile
+
+```bash
+aws configure list --profile ec2-nginx-lab
+```
+
+#### Verify AWS authentication
+
+```bash
+aws sts get-caller-identity --profile ec2-nginx-lab
+```
+
+A successful response should return your AWS account ID, ARN, and user ID.
+
+#### Verify the configured Region
+
+```bash
+aws configure get region --profile ec2-nginx-lab
+```
+
+Expected:
+
+```text
+us-west-2
+```
+
+### 6.5 AWS infrastructure and permission checks
+
+Before provisioning infrastructure, inspect the AWS environment.
+
+The following checks are part of this project's preparation and implementation process:
+
+- [ ] An active AWS account.
+- [ ] AWS CLI installed.
 - Terraform installed.
-- A working AWS CLI profile.
-- Appropriate IAM permissions.
-- An AWS Region selected.
-- Existing VPC and subnet details inspected.
-- Internet Gateway and route table verified.
-- EC2 instance type availability checked.
-- Existing EC2 key pair verified.
-- Local private key availability and permissions checked.
-- Terraform configuration files prepared.
-- `.gitignore` configured.
+- [ ] Verify that the AWS profile can authenticate.
+- [ ] Confirm the AWS Region.
+- [ ] Inspect existing VPC details.
+- [ ] Inspect available subnets.
+- [ ] Verify the Internet Gateway.
+- [ ] Inspect the route table and internet route.
+- [ ] Check EC2 instance type availability.
+- [ ] Verify the existing EC2 key pair.
+- [ ] Verify the local private key, if SSH access is required.
+- [ ] Check the IAM permissions required for discovery and deployment.
+- [ ] Prepare the Terraform configuration files.
+- [ ] Configure `.gitignore`.
+
+**Important:** The VPC, subnet, Internet Gateway, route table, and key pair do not need to be created again if suitable existing resources are available. This project reuses existing AWS networking and the existing key pair.
+
 
 ### Environment used in this project
 
@@ -226,6 +399,10 @@ Before creating AWS resources, verify the following:
 | Existing key pair | `ec2-nginx-lab-key` |
 
 **Important:** The AWS CLI profile is explicitly configured in the Terraform provider. Do not assume the default AWS CLI profile is the correct one for this project.
+
+
+**Proceed to Section 7 only after the required tools are installed and AWS authentication is working.**
+
 
 ---
 
