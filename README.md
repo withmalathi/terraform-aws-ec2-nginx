@@ -244,7 +244,7 @@ If you start directly with Terraform, follow the AWS environment discovery and v
 
 Before creating AWS resources, prepare the local environment and verify the AWS account and permissions.
 
-```
+
 **Important: Follow this section in order**
 
 This project is documented using the environment and AWS configuration used during my implementation. You can follow the same steps using your own AWS account and local environment.
@@ -252,7 +252,7 @@ This project is documented using the environment and AWS configuration used duri
 Some values, such as the AWS CLI profile name, Region, VPC, subnet, and key pair, may differ in your account. Replace project-specific values with your own verified values wherever required.
 
 **Installing the tools does not create AWS resources.** The actual resource creation happens later when Terraform commands are executed.
-```
+
 
 ### 6.1 Accounts and access required
 
