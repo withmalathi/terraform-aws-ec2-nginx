@@ -4,21 +4,18 @@ A beginner-friendly, hands-on Infrastructure as Code (IaC) project that provisio
 
 This project demonstrates how Terraform, AWS IAM, EC2, VPC networking, security groups, and NGINX work together to deploy a basic web application.
 
-> **Project status: Successfully deployed, verified, and subsequently cleaned up.**
+> **Project status: Deployment, verification, and cleanup completed.**
 >
-> Terraform successfully provisioned an EC2 instance and a dedicated security group.
+> - Terraform successfully provisioned an EC2 instance and a dedicated security group.
+> - NGINX was installed and started through EC2 user data.
+> - The website returned `HTTP 200 OK`, and the custom HTML page was successfully retrieved.
+> - Terraform outputs were saved successfully.
+> - The EC2 instance and dedicated security group were subsequently destroyed using Terraform.
+> - The existing default VPC, shared networking resources, and existing EC2 key pair were retained.
 >
-> NGINX was installed and started through EC2 user data.
+> **Historical website address:** `http://32.191.82.144`
 >
-> The website returned `HTTP 200 OK`, and the custom HTML page was successfully retrieved.
->
-> Terraform outputs were saved successfully.
->
-> After deployment verification, the Terraform-managed EC2 instance and dedicated security group were destroyed successfully.
->
-> **Previously tested website:** `http://32.191.82.144`
->
-> **Note:** This public IP belonged to the completed deployment. The EC2 instance has since been terminated, so this is a historical reference and is no longer a live website endpoint.
+> **Important:** This public IP belonged to the previous deployment. The EC2 instance has been terminated, so the website is no longer live. A new deployment will normally receive a different public IP.
 
 ---
 
@@ -56,8 +53,7 @@ The project follows a step-by-step workflow:
 8. Initialize, validate, plan, and apply Terraform configuration.
 9. Verify the EC2 instance, NGINX service, and website.
 10. Review Terraform outputs and deployment evidence.
-11. Review the Terraform destroy plan.
-12. Clean up the Terraform-managed resources and verify the cleanup.
+11. Destroy the Terraform-managed resources and verify cleanup.
 
 ### What did we deploy?
 
@@ -71,26 +67,19 @@ The project follows a step-by-step workflow:
 
 ### Final deployment verification
 
+The following results were successfully verified before cleanup:
+
 | Verification | Observed result |
 |---|---|
-| EC2 instance | Running during deployment verification |
+| EC2 instance | Running during testing |
 | System status check | `ok` |
 | Instance status check | `ok` |
 | NGINX | Installed and serving the website |
+| NGINX version | `1.30.6` |
 | HTTP response | `200 OK` |
 | Custom HTML page | Retrieved successfully |
 | Terraform outputs | Saved successfully |
-
-### Final cleanup verification
-
-| Verification | Observed result |
-|---|---|
-| Terraform destroy | Successful |
-| Terraform-managed EC2 instance | Terminated |
-| Dedicated project security group | Deleted |
-| Terraform state | Empty after destroy |
-| Existing default VPC and networking | Retained |
-| Existing EC2 key pair | Retained |
+| SSH access | Successful |
 
 ---
 
@@ -134,8 +123,8 @@ The main objectives are:
 - Deploy a basic website using NGINX.
 - Understand Terraform initialization, formatting, validation, planning, applying, and state management.
 - Practise troubleshooting using actual AWS and Terraform outputs.
-- Understand how to review a Terraform destroy plan.
-- Verify that Terraform-managed resources are cleaned up without deleting shared infrastructure.
+- Understand why infrastructure and application verification are both important.
+- Learn why cloud resources should be cleaned up after a lab.
 
 The project also demonstrates an important DevOps practice:
 
@@ -192,159 +181,182 @@ The same approach can later be extended to:
 
 ## 6. Prerequisites
 
-Before starting this project, make sure you have access to an AWS account and a local development environment where you can install and run Terraform and AWS CLI.
+Before creating AWS resources, prepare the local environment and verify the AWS account and permissions.
 
-**Don't have Terraform or AWS CLI installed? No problem!** Follow the installation steps below before proceeding with the project.
+### 6.1 Accounts and access required
 
-### 6.1 Account and software requirements
-
-| Requirement | Purpose | Required before starting? |
-|---|---|---|
-| AWS account | Provides access to AWS cloud services. | Yes |
-| WSL Ubuntu / Linux / macOS / Windows environment | Provides a terminal to execute commands. | Yes |
-| AWS CLI | Allows you to interact with AWS from the terminal. | Yes, install before AWS configuration |
-| Terraform | Automates AWS infrastructure provisioning. | Yes, install before Terraform commands |
-| AWS IAM user or role | Provides permissions to access and manage AWS resources. | Yes |
-| Git | Helps manage and version-control the project. | Recommended |
-| GitHub account | Allows you to store and share the project repository. | Optional for local execution |
+- An active AWS account.
+- Access to an AWS IAM identity with the permissions required for this lab.
+- An AWS Region selected.
+- Internet access to download the required tools and communicate with AWS.
+- A terminal such as WSL Ubuntu, Linux, macOS, or Windows PowerShell.
 
 ### 6.2 Install the required tools
 
-If Terraform or AWS CLI is not installed on your system, install them first.
+**Important for beginners:** If AWS CLI or Terraform is not installed on your computer, install it before proceeding. You do not need to have both tools installed beforehand.
 
-#### A. Install AWS CLI
+#### A. Install Git
 
-AWS CLI allows you to interact with AWS services from your terminal.
+Git is used to clone the project repository and manage project changes.
 
-For Ubuntu / WSL Ubuntu, follow the official AWS installation instructions:
-
-https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html
-
-After installation, verify it:
-
-```bash
-aws --version
-```
-
-Expected output format:
-
-```text
-aws-cli/2.x.x Python/3.x.x Linux/...
-```
-
-The exact version and additional details may differ.
-
-#### B. Install Terraform
-
-Terraform is used to define and provision AWS infrastructure through configuration files.
-
-For Ubuntu / WSL Ubuntu, follow the official HashiCorp installation instructions:
-
-https://developer.hashicorp.com/terraform/install
-
-After installation, verify it:
-
-```bash
-terraform version
-```
-
-Expected output format:
-
-```text
-Terraform vX.Y.Z
-```
-
-The version may differ depending on when you install it.
-
-#### C. Install Git (if not already installed)
-
-Git is used for version control.
+Check whether Git is installed:
 
 ```bash
 git --version
 ```
 
-If Git is not installed on Ubuntu:
+If it is not installed on Ubuntu/WSL:
 
 ```bash
 sudo apt update
 sudo apt install git -y
 ```
 
-Verify again:
+Verify:
 
 ```bash
 git --version
 ```
 
-### 6.3 Configure AWS CLI credentials
+Official documentation: https://git-scm.com/downloads
 
-Once AWS CLI is installed, configure an AWS profile.
+#### B. Install AWS CLI
 
-For this project, the profile used is:
-
-```text
-ec2-nginx-lab
-```
-
-Configure your own credentials using:
-
-```bash
-aws configure --profile ec2-nginx-lab
-```
-
-AWS CLI prompts for:
-
-- AWS Access Key ID
-- AWS Secret Access Key
-- Default Region Name
-- Default Output Format
-
-For this project, the Region is:
-
-```text
-us-west-2
-```
-
-For output format, you can enter:
-
-```text
-json
-```
-
-**Security note:** Never share your access keys or commit AWS credentials to GitHub. For production environments, prefer IAM roles or another supported temporary credential mechanism instead of long-lived access keys.
-
-### 6.4 Verify your environment before proceeding
-
-After installation and configuration, verify that the required tools and AWS access are working.
-
-#### Check Terraform
-
-```bash
-terraform version
-```
-
-#### Check AWS CLI
+Check whether AWS CLI is installed:
 
 ```bash
 aws --version
 ```
 
-#### Check the configured AWS profile
+If the command is not found, install AWS CLI version 2 by following the official installation instructions for your operating system:
+
+https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html
+
+For Ubuntu/WSL, use the official Linux installation instructions. Select the correct package for your computer architecture.
+
+Verify the installation:
 
 ```bash
-aws configure list --profile ec2-nginx-lab
+aws --version
 ```
 
-#### Verify AWS authentication
+Expected: AWS CLI version information should be displayed.
+
+#### C. Install Terraform
+
+Check whether Terraform is installed:
+
+```bash
+terraform version
+```
+
+If it is not installed, follow the official HashiCorp installation instructions for your operating system:
+
+https://developer.hashicorp.com/terraform/install
+
+Verify:
+
+```bash
+terraform version
+```
+
+Expected: Terraform version information should be displayed.
+
+#### D. Install an SSH client
+
+An SSH client is required to connect to the EC2 instance for troubleshooting and verification.
+
+On Ubuntu/WSL:
+
+```bash
+sudo apt update
+sudo apt install openssh-client -y
+```
+
+Verify:
+
+```bash
+ssh -V
+```
+
+### 6.3 Clone the project repository
+
+Once Git is installed, clone the repository:
+
+```bash
+git clone https://github.com/withmalathi/terraform-aws-ec2-nginx.git
+```
+
+Move into the project directory:
+
+```bash
+cd terraform-aws-ec2-nginx
+```
+
+Verify:
+
+```bash
+pwd
+ls -la
+```
+
+If you have already downloaded the repository as a ZIP file, extract it and navigate to the extracted project directory instead.
+
+### 6.4 Configure AWS CLI authentication
+
+AWS CLI must be configured with credentials for an IAM identity that has the required permissions.
+
+This project used the named profile:
+
+```text
+ec2-nginx-lab
+```
+
+Configure your own profile:
+
+```bash
+aws configure --profile ec2-nginx-lab
+```
+
+AWS CLI will request:
+
+```text
+AWS Access Key ID
+AWS Secret Access Key
+Default region name
+Default output format
+```
+
+For this project, the Region was:
+
+```text
+us-west-2
+```
+
+The output format was:
+
+```text
+json
+```
+
+**Credential safety:**
+
+- Never commit access keys, secret access keys, session tokens, or private keys to GitHub.
+- Do not paste credentials into README files or screenshots.
+- Prefer temporary credentials or IAM roles where appropriate.
+- If credentials are exposed, rotate or revoke them promptly.
+
+### 6.5 Verify the AWS identity
+
+Run:
 
 ```bash
 aws sts get-caller-identity --profile ec2-nginx-lab
 ```
 
-A successful response should return your AWS account ID, ARN, and user ID.
+This verifies whether the selected profile can authenticate with AWS.
 
-#### Verify the configured Region
+### 6.6 Verify the configured Region
 
 ```bash
 aws configure get region --profile ec2-nginx-lab
@@ -356,32 +368,45 @@ Expected:
 us-west-2
 ```
 
-### 6.5 AWS infrastructure and permission checks
+### 6.7 Verify the credential source safely
 
-Before provisioning infrastructure, inspect the AWS environment.
+```bash
+aws configure list --profile ec2-nginx-lab
+```
 
-The following checks are part of this project's preparation and implementation process:
+This helps identify the credential source and configured Region without displaying the secret access key.
 
-- [ ] An active AWS account.
-- [ ] AWS CLI installed.
-- Terraform installed.
-- [ ] Verify that the AWS profile can authenticate.
-- [ ] Confirm the AWS Region.
-- [ ] Inspect existing VPC details.
-- [ ] Inspect available subnets.
-- [ ] Verify the Internet Gateway.
-- [ ] Inspect the route table and internet route.
-- [ ] Check EC2 instance type availability.
-- [ ] Verify the existing EC2 key pair.
-- [ ] Verify the local private key, if SSH access is required.
-- [ ] Check the IAM permissions required for discovery and deployment.
-- [ ] Prepare the Terraform configuration files.
-- [ ] Configure `.gitignore`.
+### 6.8 Check available AWS CLI profiles
 
-**Important:** The VPC, subnet, Internet Gateway, route table, and key pair do not need to be created again if suitable existing resources are available. This project reuses existing AWS networking and the existing key pair.
+```bash
+aws configure list-profiles
+```
 
+### 6.9 Before-provisioning checklist
 
-### Environment used in this project
+Having Terraform and AWS CLI installed does not automatically mean that the environment is ready to deploy.
+
+Before creating resources, verify:
+
+- [ ] AWS account is active.
+- [ ] AWS CLI is installed and working.
+- [ ] Terraform is installed and working.
+- [ ] Git is installed and the repository is cloned.
+- [ ] Correct AWS CLI profile is selected.
+- [ ] AWS authentication succeeds.
+- [ ] Correct AWS Region is selected.
+- [ ] Required IAM permissions are available.
+- [ ] Existing VPC and subnet details are inspected.
+- [ ] Internet Gateway and route table are verified.
+- [ ] EC2 instance type availability is checked.
+- [ ] Existing EC2 key pair is verified.
+- [ ] Local private key is available and protected.
+- [ ] Terraform configuration files are present.
+- [ ] `.gitignore` is configured.
+- [ ] SSH access is restricted to a trusted source IP.
+- [ ] The Terraform plan has been reviewed before deployment.
+
+### 6.10 Environment used in this project
 
 | Item | Value |
 |---|---|
@@ -398,11 +423,9 @@ The following checks are part of this project's preparation and implementation p
 | Existing VPC | Default VPC |
 | Existing key pair | `ec2-nginx-lab-key` |
 
-**Important:** The AWS CLI profile is explicitly configured in the Terraform provider. Do not assume the default AWS CLI profile is the correct one for this project.
+**Important:** The AWS CLI profile is explicitly configured in the Terraform provider. If you use a different profile name or Region, update `versions.tf` and the corresponding AWS CLI commands throughout this README.
 
-
-**Proceed to Section 7 only after the required tools are installed and AWS authentication is working.**
-
+This project reuses an existing default VPC, subnet, Internet Gateway, route table, and key pair. If your AWS account does not have suitable networking resources, you must create or adapt the networking configuration before deploying.
 
 ---
 
@@ -457,15 +480,10 @@ terraform-aws-ec2-nginx/
     ├── 4-16-save-the-terraform-outputs.png
     ├── 4-17-test-your-nginx-website.png
     ├── 4-18-terraform-deployed-ec2-instance-is-successfully-serving-http-traffic.png
-    ├── 4-19-terraform-nginx-live-website.png
-    ├── 5-1-generate-the-destroy-plan.png
-    ├── 5-2-execute-cleanup.png
-    ├── 5-3-verify-terraform-state.png
-    ├── 5-4-verify-ec2-instance.png
-    └── 5-5-verify-security-group.png
+    └── 4-19-terraform-nginx-live-website.png
 ```
 
-**Note:** The screenshot directory also contains intermediate deployment evidence captured during the Terraform troubleshooting process. Keep the screenshot references synchronized with the actual filenames in your repository. The tree above lists the known screenshot references; it does not claim that every intermediate screenshot filename has been independently verified.
+**Note:** The screenshot directory also contains intermediate deployment evidence captured during the Terraform troubleshooting process. Keep the screenshot references synchronized with the actual filenames in your repository.
 
 ### Terraform file responsibilities
 
@@ -534,11 +552,11 @@ us-west-2
 
 #### Step 1.5: Inspect the credential source safely
 
-Check where AWS CLI obtains its credentials without printing the secret access key.
-
 ```bash
 aws configure list --profile ec2-nginx-lab
 ```
+
+Check where AWS CLI obtains its credentials without printing the secret access key.
 
 ![Inspect the credential source](screenshots/1-5-inspect-the-credential-source-without-revealing-the-secret-key.png)
 
@@ -744,7 +762,7 @@ aws sts get-caller-identity --profile ec2-nginx-lab
 
 ![Verify AWS credentials](screenshots/2-17-verify-the-aws-credentials.png)
 
-### Step 2.18: IAM policy configuration
+#### Step 2.18: IAM policy configuration
 
 Two inline IAM policies were used for this lab:
 
@@ -1040,6 +1058,8 @@ override.tf.json
 
 **Important:** `.gitignore` prevents new untracked files from being added accidentally. It does not remove files that are already tracked by Git.
 
+Commit `.terraform.lock.hcl` so that the selected provider version and checksums can be reproduced. Do not commit Terraform state files or private credentials.
+
 #### Step 3.3: Understand Terraform state
 
 Terraform uses a state file to maintain information about the infrastructure it manages.
@@ -1090,7 +1110,7 @@ The default security group is not modified.
 | Inbound | 80 | TCP | HTTP access to the public NGINX website. |
 | Outbound | All | All | Outbound communication required by the instance. |
 
-SSH should not be exposed to `0.0.0.0/0`.
+SSH should not be exposed to `0.0.0.0/0`. Use your own trusted public IP address with a `/32` CIDR wherever possible.
 
 HTTP is publicly accessible because this project demonstrates a publicly accessible website.
 
@@ -1124,6 +1144,8 @@ The website displays:
 ```
 
 This allows the web server to be configured automatically without manually logging into the instance to install NGINX.
+
+**Reproducibility note:** The project structure identifies `main.tf`, `variables.tf`, and `outputs.tf` as the Terraform configuration files. Use the actual committed versions of those files alongside this README when reproducing the deployment. This README documents their responsibilities and the verified workflow; it does not replace the Terraform source files.
 
 ---
 
@@ -1245,6 +1267,8 @@ Resources: 0 added, 0 changed, 0 destroyed.
 
 ![Save Terraform outputs](screenshots/4-16-save-the-terraform-outputs.png)
 
+**Troubleshooting note:** `terraform untaint` was the command used during this historical lab. In newer workflows, `terraform apply -replace=aws_instance.nginx` is generally the preferred approach when the intention is to replace a resource. Do not remove a tainted status unless you have independently verified that the resource is healthy and safe to retain.
+
 ---
 
 ### Phase 7: Verify the Deployment
@@ -1332,13 +1356,15 @@ The custom HTML page was successfully retrieved:
 
 #### Step 7.6: Verify through a web browser
 
-Open the website in a browser:
+During the deployment, the website was opened at:
 
 ```text
 http://32.191.82.144
 ```
 
-The custom NGINX homepage was displayed successfully during the deployment.
+The custom NGINX homepage was displayed successfully.
+
+**Historical deployment address only:** The EC2 instance has since been terminated. This address is no longer an active website endpoint.
 
 ![Terraform NGINX live website](screenshots/4-19-terraform-nginx-live-website.png)
 
@@ -1351,10 +1377,11 @@ The custom NGINX homepage was displayed successfully during the deployment.
 | Terraform formatting | Successful |
 | Terraform validation | Successful |
 | Terraform plan | Reviewed |
-| EC2 instance | Running during verification |
+| EC2 instance | Running during testing |
 | System health | `ok` |
 | Instance health | `ok` |
 | NGINX | Serving requests |
+| NGINX version | `1.30.6` |
 | HTTP response | `200 OK` |
 | HTML response | Successful |
 | Terraform outputs | Saved |
@@ -1378,20 +1405,13 @@ terraform plan -destroy
 
 Inspect the proposed deletion carefully.
 
-For this project, the destroy plan showed:
+The reviewed plan showed:
 
 ```text
 Plan: 0 to add, 0 to change, 2 to destroy.
 ```
 
-The two resources identified for destruction were:
-
-- The Terraform-managed EC2 instance.
-- The dedicated project security group.
-
-The existing default VPC, subnet, Internet Gateway, route table, and reused key pair were not included in the destruction plan.
-
-![Generate the Terraform destroy plan](screenshots/5-1-generate-the-destroy-plan.png)
+This identified the two Terraform-managed resources intended for deletion: the EC2 instance and the dedicated security group.
 
 #### Step 8.2: Destroy the Terraform-managed resources
 
@@ -1401,13 +1421,11 @@ terraform destroy
 
 Review the proposed actions and type `yes` only after confirming that the resources are the intended project resources.
 
-Observed result:
+The cleanup completed successfully:
 
 ```text
 Destroy complete! Resources: 2 destroyed.
 ```
-
-![Execute Terraform cleanup](screenshots/5-2-execute-cleanup.png)
 
 #### Step 8.3: Verify Terraform state
 
@@ -1415,51 +1433,29 @@ Destroy complete! Resources: 2 destroyed.
 terraform state list
 ```
 
-After successful destruction, the command returned no output.
+The state list was empty after cleanup.
 
-This confirmed that no resources remained in the Terraform state for this project.
+#### Step 8.4: Verify the EC2 instance
 
-![Verify Terraform state after cleanup](screenshots/5-3-verify-terraform-state.png)
+The EC2 instance was checked through AWS CLI and confirmed terminated.
 
-#### Step 8.4: Verify EC2 instance termination
+#### Step 8.5: Verify the security group
 
-```bash
-aws ec2 describe-instances \
-  --instance-ids i-0555e880526a9cfa7 \
-  --region us-west-2 \
-  --profile ec2-nginx-lab \
-  --query 'Reservations[].Instances[].{InstanceId:InstanceId,State:State.Name}' \
-  --output table
-```
+The dedicated lab security group was checked and confirmed deleted.
 
-The EC2 instance was independently verified as:
+#### Step 8.6: Confirm retained shared resources
 
-```text
-terminated
-```
+The following resources were retained because they were existing shared resources and were not created by this Terraform project:
 
-![Verify EC2 instance cleanup](screenshots/5-4-verify-ec2-instance.png)
+- Default VPC.
+- Existing subnet.
+- Internet Gateway.
+- Existing route table.
+- Existing EC2 key pair.
 
-#### Step 8.5: Verify security group deletion
+The EC2 root EBS volume was deleted through the instance's `delete_on_termination` setting.
 
-```bash
-aws ec2 describe-security-groups \
-  --group-ids sg-09671f1da0f62da1a \
-  --region us-west-2 \
-  --profile ec2-nginx-lab
-```
-
-The AWS CLI returned:
-
-```text
-InvalidGroup.NotFound
-```
-
-This confirmed that the dedicated project security group had been deleted.
-
-![Verify security group cleanup](screenshots/5-5-verify-security-group.png)
-
-#### Cleanup precautions
+**Important cleanup precautions:**
 
 - Do not delete the existing default VPC.
 - Do not delete shared networking resources.
@@ -1467,26 +1463,17 @@ This confirmed that the dedicated project security group had been deleted.
 - Do not manually delete resources managed by Terraform unless you understand the impact on state.
 - Confirm the destroy plan before approving it.
 - Verify the AWS Region and active profile before cleanup.
-- Check whether other billable resources were created outside Terraform.
-- Remember that terminating an EC2 instance does not automatically delete every independent AWS resource.
+- Review AWS billing and other Regions/services separately; checking this project's resources does not prove that the entire AWS account has no billable resources.
 
-#### Actual cleanup results
+#### Step 8.7: Cleanup evidence
 
-| Resource | Actual result |
-|---|---|
-| EC2 instance `i-0555e880526a9cfa7` | Terminated |
-| Dedicated security group `sg-09671f1da0f62da1a` | Deleted |
-| Terraform state | Empty after destroy |
-| Root EBS volume | Deleted through instance termination; `delete_on_termination` was enabled |
-| Default VPC | Retained |
-| Existing subnet | Retained |
-| Internet Gateway | Retained |
-| Route table | Retained |
-| Existing key pair `ec2-nginx-lab-key` | Retained |
+The cleanup screenshots document the following checks:
 
-**Important:** Terraform destroyed the two resources managed by this project. Existing shared networking and the reused key pair were intentionally preserved.
-
-These cleanup results apply to the resources checked in `us-west-2`. They are not a guarantee that no billable resources exist in other Regions or AWS services.
+- `5-1-generate-the-destroy-plan.png`
+- `5-2-execute-cleanup.png`
+- `5-3-verify-terraform-state.png`
+- `5-4-verify-ec2-instance.png`
+- `5-5-verify-security-group.png`
 
 ---
 
@@ -1503,7 +1490,7 @@ These cleanup results apply to the resources checked in `us-west-2`. They are no
 - Automated NGINX installation through EC2 user data.
 - Clear separation of configuration, variables, and outputs.
 - Hands-on troubleshooting of Terraform state and resource status.
-- Safe cleanup through Terraform destroy planning and verification.
+- Better understanding of infrastructure cleanup and cloud cost control.
 
 ### Disadvantages
 
@@ -1514,14 +1501,13 @@ These cleanup results apply to the resources checked in `us-west-2`. They are no
 - Public IP addresses may change when instances are replaced.
 - A successful Terraform deployment does not automatically guarantee application availability.
 - Troubleshooting requires understanding both Terraform and AWS service behavior.
-- Incorrect destroy plans can remove resources if they are not reviewed carefully.
+- Reusing existing networking resources requires the user to inspect their AWS environment before deployment.
 
 ---
 
 ## 10. Current Progress
 
-<details>
-<summary>Completed tasks</summary>
+### Completed tasks
 
 - [x] Created the Terraform project repository.
 - [x] Verified the local project directory.
@@ -1556,14 +1542,38 @@ These cleanup results apply to the resources checked in `us-west-2`. They are no
 - [x] Retrieved the custom HTML page using `curl`.
 - [x] Opened the NGINX website in a browser.
 - [x] Captured deployment evidence in the screenshots directory.
-- [x] Reviewed the Terraform destroy plan.
+- [x] Generated and reviewed the Terraform destroy plan.
 - [x] Destroyed the Terraform-managed EC2 instance and security group.
-- [x] Verified the Terraform state was empty after cleanup.
+- [x] Verified the Terraform state was empty.
 - [x] Verified the EC2 instance was terminated.
 - [x] Verified the dedicated security group was deleted.
-- [x] Retained the existing shared networking resources and key pair.
+- [x] Confirmed shared networking resources and the existing key pair were retained.
 
-</details>
+### Final project status
+
+| Activity | Status |
+|---|---|
+| Environment preparation | Completed |
+| AWS authentication | Verified |
+| IAM discovery permissions | Configured |
+| IAM deployment permissions | Configured |
+| Infrastructure discovery | Completed |
+| Terraform configuration | Completed |
+| EC2 deployment | Successful |
+| NGINX installation | Successful |
+| Website verification | HTTP `200 OK` |
+| Troubleshooting | Completed |
+| Terraform cleanup | Successful |
+| EC2 instance | Terminated |
+| Dedicated security group | Deleted |
+| Shared networking | Retained |
+
+### Remaining documentation and maintenance tasks
+
+- [ ] Confirm every screenshot referenced in this README exists in the repository.
+- [ ] Commit and push the final README and screenshot evidence.
+- [ ] Rehearse the project demonstration using a fresh deployment plan.
+- [ ] Review AWS billing and other resources in the account independently.
 
 ---
 
@@ -1571,7 +1581,7 @@ These cleanup results apply to the resources checked in `us-west-2`. They are no
 
 This project demonstrates how to provision AWS infrastructure using Terraform and deploy a basic web application using NGINX.
 
-The implementation covered more than simply launching an EC2 instance. It included AWS environment discovery, IAM permission troubleshooting, VPC and subnet inspection, security group configuration, Terraform state handling, EC2 user data, deployment verification, and resource cleanup.
+The implementation covered more than simply launching an EC2 instance. It included AWS environment discovery, IAM permission troubleshooting, VPC and subnet inspection, security group configuration, Terraform state handling, EC2 user data, deployment verification, and infrastructure cleanup.
 
 One important learning from this project was that **Terraform reporting a resource creation does not automatically mean the application is working**.
 
@@ -1585,8 +1595,7 @@ In this deployment:
 - The website returned HTTP `200 OK`.
 - The custom HTML page was successfully served.
 - Terraform outputs were saved.
-- The Terraform-managed resources were subsequently destroyed.
-- The cleanup was verified using Terraform state and AWS CLI.
+- The Terraform-managed EC2 instance and dedicated security group were subsequently destroyed successfully.
 
 This project provided practical experience with AWS infrastructure automation and established a foundation for more advanced Terraform, cloud, and DevOps projects.
 
