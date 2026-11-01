@@ -778,15 +778,16 @@ Verify whether the IAM identity can inspect the EC2 resources required for the p
 
 Review the permissions available for security group operations.
 
+```bash
+aws ec2 describe-security-groups --region us-west-2 --profile ec2-nginx-lab --query "SecurityGroups[].{GroupId:GroupId,Name:GroupName,VpcId:VpcId,Description:Description}" --output table
+```
+
 ![Check security group permissions](screenshots/2-6-check-security-group-permissions.png)
 
 #### Step 2.7: Inspect existing security groups
 
 ```bash
-aws ec2 describe-security-groups \
-  --profile ec2-nginx-lab \
-  --region us-west-2 \
-  --output table
+aws ec2 describe-security-groups --group-ids sg-0305c3222ac971de1 --region us-west-2 --profile ec2-nginx-lab --query "SecurityGroups[].{Name:GroupName,Inbound:IpPermissions,Outbound:IpPermissionsEgress}" --output json
 ```
 
 The existing default security group was inspected. A separate security group was planned for the project rather than modifying the default security group.
