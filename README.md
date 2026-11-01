@@ -209,7 +209,8 @@ Learn and inspect AWS infrastructure
 
 Automate selected infrastructure resources
 - The Terraform project takes that understanding further by automating the creation and management of selected resources.
- <img width="1244" height="700" alt="image" src="https://github.com/user-attachments/assets/6d9ccf71-b91b-4cf6-bc51-bc7b39708de1" />
+ <img width="1672" height="941" alt="Terraform AWS VPC Architecture Diagram" src="https://github.com/user-attachments/assets/cb038a53-c481-4442-a22d-d87b8281434c" />
+
 
 - Terraform provider · Data sources · Security group · EC2 · NGINX · State
   
