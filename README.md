@@ -716,7 +716,7 @@ Before creating infrastructure, inspect the existing AWS environment.
 
 This is important because we do not want to create duplicate resources or accidentally modify shared network infrastructure.
 
-#### Step 2.1: Check AWS permissions
+#### Step 2.1: Inspect existing VPCs
 
 Review the available permissions before creating resources.
 
@@ -790,7 +790,7 @@ aws ec2 describe-security-groups --region us-west-2 --profile ec2-nginx-lab --qu
 aws ec2 describe-security-groups --group-ids sg-0305c3222ac971de1 --region us-west-2 --profile ec2-nginx-lab --query "SecurityGroups[].{Name:GroupName,Inbound:IpPermissions,Outbound:IpPermissionsEgress}" --output json
 ```
 
-The existing default security group was inspected. A separate security group was planned for the project rather than modifying the default security group.
+The existing ec2-nginx-lab-sg security group was inspected. The default security group was not modified. A separate security group was planned for the project rather than modifying the default security group.
 
 ![Inspect existing security group rules](screenshots/2-7-inspect-the-existing-security-group-rules.png)
 
@@ -878,7 +878,7 @@ The `t3.micro` instance type was available in:
 
 ![Retest instance type discovery](screenshots/2-12-retest-instance-type-discovery.png)
 
-#### Step 2.13: Verify deployment permissions
+#### Step 2.13: Discover Amazon Linux 2023 AMIs
 
 Review the permissions required for EC2 deployment and security group configuration.
 
