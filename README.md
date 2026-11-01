@@ -829,6 +829,16 @@ Check whether the intended EC2 instance type is offered in the selected AWS Regi
 
 This helps confirm that the selected instance type can be used in the target Availability Zone before proceeding with deployment.
 
+```bash
+aws ec2 describe-instance-type-offerings \
+  --profile ec2-nginx-lab \
+  --region us-west-2 \
+  --location-type availability-zone \
+  --filters "Name=instance-type,Values=t3.micro" \
+  --query 'InstanceTypeOfferings[].{Type:InstanceType,AZ:Location}' \
+  --output table
+  ```
+
 ![Verify instance type availability](screenshots/2-10-verify-the-ec2-instance-type-is-available.png)
 
 #### Step 2.11: Check IAM inspection permissions
@@ -838,7 +848,7 @@ Some IAM inspection operations may be restricted for a lab user. Check permissio
 Use the AWS CLI to verify the currently authenticated identity:
 
 ```bash
-aws sts get-caller-identity --profile ec2-nginx-lab
+aws iam get-user --profile ec2-nginx-lab
 ```
 
 Use the AWS Management Console or IAM Policy Simulator to investigate permissions when direct IAM inspection is restricted.
