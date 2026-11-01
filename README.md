@@ -899,6 +899,16 @@ For `ec2:RunInstances`, review the resource-level evaluation for the AMI, instan
 
 The Policy Simulator returned `Allowed` for `ec2:RunInstances` across the five resource types listed above.
 
+```bash
+aws ec2 describe-images \
+  --profile ec2-nginx-lab \
+  --region us-west-2 \
+  --owners amazon \
+  --filters "Name=name,Values=al2023-ami-2023.12.*-kernel-6.18-x86_64" "Name=state,Values=available" \
+  --query 'Images | sort_by(@, &CreationDate)[-3:].[ImageId,Name,CreationDate]' \
+  --output table
+  ```
+
 ![Verify EC2 deployment permissions](screenshots/2-13-verify-the-ec2-deployment-permissions.png)
 
 #### Step 2.14: Verify EC2 instance creation permissions
