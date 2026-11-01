@@ -720,6 +720,10 @@ This is important because we do not want to create duplicate resources or accide
 
 Review the available permissions before creating resources.
 
+```bash
+aws ec2 describe-vpcs --region us-west-2 --profile ec2-nginx-lab --query "Vpcs[].{VpcId:VpcId,State:State,IsDefault:IsDefault}" --output table
+```
+
 ![Check AWS permissions](screenshots/2-1-check-aws-permissions-before-creating-resources.png)
 
 #### Step 2.2: Inspect existing subnets
