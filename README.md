@@ -825,7 +825,9 @@ Never upload private keys to GitHub or include their contents in screenshots.
 
 #### Step 2.10: Verify EC2 instance type availability
 
-Check whether the intended EC2 instance type is offered in the selected Region and Availability Zone.
+Check whether the intended EC2 instance type is offered in the selected AWS Region and Availability Zone.
+
+This helps confirm that the selected instance type can be used in the target Availability Zone before proceeding with deployment.
 
 ![Verify instance type availability](screenshots/2-10-verify-the-ec2-instance-type-is-available.png)
 
@@ -833,11 +835,36 @@ Check whether the intended EC2 instance type is offered in the selected Region a
 
 Some IAM inspection operations may be restricted for a lab user. Check permissions without assuming the user can inspect every IAM setting.
 
+Use the AWS CLI to verify the currently authenticated identity:
+
+```bash
+aws sts get-caller-identity --profile ec2-nginx-lab
+```
+
+Use the AWS Management Console or IAM Policy Simulator to investigate permissions when direct IAM inspection is restricted.
+
 ![Check IAM inspection permissions](screenshots/2-11-check-whether-you-can-inspect-your-own-iam-permissions.png)
 
 #### Step 2.12: Retest instance type discovery
 
 After updating the discovery permissions, retest instance type availability.
+
+Run:
+
+```bash
+aws ec2 describe-instance-type-offerings --profile ec2-nginx-lab --region us-west-2 --location-type availability-zone --filters "Name=instance-type,Values=t3.micro" --query 'InstanceTypeOfferings[].{Type:InstanceType,AZ:Location}' --output table
+```
+
+The command checks which Availability Zones offer the selected instance type.
+
+**Verified result from this lab:**
+
+The `t3.micro` instance type was available in:
+
+- `us-west-2a`
+- `us-west-2b`
+- `us-west-2c`
+- `us-west-2d`
 
 ![Retest instance type discovery](screenshots/2-12-retest-instance-type-discovery.png)
 
@@ -845,11 +872,39 @@ After updating the discovery permissions, retest instance type availability.
 
 Review the permissions required for EC2 deployment and security group configuration.
 
+Use the AWS IAM Policy Simulator to evaluate the deployment permissions associated with the lab IAM identity.
+
+Review the following EC2 actions:
+
+| IAM permission | Purpose |
+|---|---|
+| `ec2:CreateKeyPair` | Create an EC2 key pair |
+| `ec2:CreateSecurityGroup` | Create a security group |
+| `ec2:AuthorizeSecurityGroupIngress` | Configure inbound security group rules |
+| `ec2:RunInstances` | Launch an EC2 instance |
+
+For `ec2:RunInstances`, review the resource-level evaluation for the AMI, instance, subnet, network interface, and security group.
+
+**Verified result from this lab:**
+
+The Policy Simulator returned `Allowed` for `ec2:RunInstances` across the five resource types listed above.
+
 ![Verify EC2 deployment permissions](screenshots/2-13-verify-the-ec2-deployment-permissions.png)
 
 #### Step 2.14: Verify EC2 instance creation permissions
 
 Check whether the IAM policy permits the required EC2 creation operations.
+
+Use the IAM Policy Simulator to review the relevant EC2 creation actions and their evaluation results.
+
+Pay particular attention to the permissions required for:
+
+- Creating key pairs.
+- Creating security groups.
+- Authorizing security group ingress.
+- Launching EC2 instances.
+
+Confirm the evaluation results before proceeding with resource creation.
 
 ![Verify EC2 instance creation permissions](screenshots/2-14-verify-ec2-instance-creation-permissions.png)
 
@@ -857,7 +912,9 @@ Check whether the IAM policy permits the required EC2 creation operations.
 
 During discovery and deployment, some AWS API calls returned authorization errors.
 
-Instead of granting broad `ec2:*` access, the missing actions were identified and added to the appropriate lab policies.
+Instead of granting broad `ec2:*` access, identify the missing actions and add only the required permissions to the appropriate lab policies.
+
+This follows the principle of least privilege by granting only the permissions needed for the lab.
 
 ![Identify permission gaps](screenshots/2-15-identify-the-remaining-permission-gaps.png)
 
@@ -867,13 +924,27 @@ The deployment policy was updated to include `ec2:CreateTags`.
 
 This permission allows the IAM identity to create tags on resources during provisioning.
 
+The policy updated in this lab was:
+
+`EC2-NGINX-Lab-Deployment`
+
+After saving the policy changes, review the relevant permission evaluation again using the IAM Policy Simulator.
+
 ![Update the deployment policy](screenshots/2-16-update-the-deployment-policy-add-ec2-createtags.png)
 
 #### Step 2.17: Verify AWS credentials again
 
+After completing the IAM policy updates, verify that the AWS CLI can still authenticate using the intended lab profile.
+
+Run:
+
 ```bash
 aws sts get-caller-identity --profile ec2-nginx-lab
 ```
+
+Confirm that the returned account and ARN correspond to the expected AWS account and IAM identity.
+
+This verifies credential authentication. It does not independently confirm that every EC2 deployment permission is allowed.
 
 ![Verify AWS credentials](screenshots/2-17-verify-the-aws-credentials.png)
 
