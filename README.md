@@ -50,10 +50,9 @@ The project follows a step-by-step workflow:
 5. Configure the Terraform AWS provider.
 6. Define an EC2 instance and dedicated security group.
 7. Install and configure NGINX using EC2 user data.
-8. Initialize, validate, plan, and apply Terraform configuration.
-9. Verify the EC2 instance, NGINX service, and website.
-10. Review Terraform outputs and deployment evidence.
-11. Destroy the Terraform-managed resources and verify cleanup.
+8. Initialize, validate, plan, and apply the Terraform configuration.
+9. Review Terraform outputs and verify the EC2 instance, NGINX service, and website.
+10. Destroy the Terraform-managed resources and verify cleanup.
 
 ### What did we deploy?
 
@@ -584,16 +583,12 @@ terraform-aws-ec2-nginx/
     ├── 2-17-verify-the-aws-credentials.png
     ├── 3-1-configure-terraform-to-use-the-correct-aws-profile.png
     ├── 3-2-create-a-.gitignore-file.png
-    ├── 4-13-remove-the-tainted-status-without-deleting-ec2.png
-    ├── 4-14-remove-terraforms-tainted-status.png
-    ├── 4-15-run-a-fresh-terraform-plan.png
-    ├── 4-16-save-the-terraform-outputs.png
     ├── 4-17-test-your-nginx-website.png
     ├── 4-18-terraform-deployed-ec2-instance-is-successfully-serving-http-traffic.png
     └── 4-19-terraform-nginx-live-website.png
 ```
 
-**Note:** The screenshot directory also contains intermediate deployment evidence captured during the Terraform troubleshooting process. Keep the screenshot references synchronized with the actual filenames in your repository.
+**Note:** The project tree lists the deployment-verification screenshots used in the main workflow. Keep the screenshot references synchronized with the actual filenames in your repository. Historical troubleshooting screenshots can be retained separately if you want to preserve them as personal learning evidence.
 
 ### Terraform file responsibilities
 
@@ -1355,7 +1350,7 @@ This allows the web server to be configured automatically without manually loggi
 
 ---
 
-### Phase 5: Initialize and Validate Terraform
+### Phase 5: Initialize, Validate, and Deploy Terraform
 
 After preparing the Terraform configuration, run the following commands in order.
 
@@ -1411,79 +1406,19 @@ terraform apply
 
 Review the proposed actions. Type `yes` only if the plan matches the intended deployment.
 
----
-
-### Phase 6: Deploy EC2 and NGINX
-
-The Terraform deployment creates:
-
-1. A dedicated security group.
-2. Inbound and outbound security group rules.
-3. An EC2 instance using Amazon Linux 2023.
-4. NGINX through EC2 user data.
-5. Terraform outputs for the deployed resources.
-
-#### Deployment troubleshooting: Terraform tainted instance
-
-During the deployment, an AWS permission error occurred while Terraform was reading instance information.
-
-The instance had been created, but Terraform marked the instance as **tainted** because the operation did not complete successfully from Terraform's perspective.
-
-A tainted resource means Terraform considers that resource to need replacement during a future apply.
-
-In this case, the EC2 instance itself was checked and found to be healthy. The issue was addressed by removing the tainted status after verifying the instance.
-
-The following command was used:
-
-```bash
-terraform untaint aws_instance.nginx
-```
-
-This removes the tainted marker from the resource in Terraform state. It does not recreate or terminate the EC2 instance.
-
-Afterward, a fresh plan was reviewed to confirm that Terraform no longer proposed replacing the healthy instance.
-
-![Remove the tainted status without deleting EC2](screenshots/4-13-remove-the-tainted-status-without-deleting-ec2.png)
-
-![Verify Terraform tainted status was removed](screenshots/4-14-remove-terraforms-tainted-status.png)
-
-#### Review the fresh Terraform plan
-
-```bash
-terraform plan
-```
-
-The plan showed no infrastructure changes were required. The remaining operation was to save the Terraform outputs.
-
-![Run a fresh Terraform plan](screenshots/4-15-run-a-fresh-terraform-plan.png)
-
-#### Save Terraform outputs
-
-```bash
-terraform apply
-```
-
-The apply operation saved the outputs without adding, changing, or destroying infrastructure.
-
-Observed result:
-
-```text
-Resources: 0 added, 0 changed, 0 destroyed.
-```
-
-![Save Terraform outputs](screenshots/4-16-save-the-terraform-outputs.png)
-
-**Troubleshooting note:** `terraform untaint` was the command used during this historical lab. In newer workflows, `terraform apply -replace=aws_instance.nginx` is generally the preferred approach when the intention is to replace a resource. Do not remove a tainted status unless you have independently verified that the resource is healthy and safe to retain.
+After the apply completes, Terraform records the managed resources and configured outputs in its state. Continue to Phase 6 to review the outputs and verify the deployed application.
 
 ---
 
-### Phase 7: Verify the Deployment
+### Phase 6: Verify the Deployment
 
 A successful Terraform apply does not automatically guarantee that the application is accessible.
 
 The EC2 instance, health checks, NGINX service, and HTTP response must also be verified.
 
-#### Step 7.1: Check Terraform outputs
+#### Step 6.1: Review Terraform outputs
+
+Terraform records the configured outputs during `terraform apply`. Use `terraform output` to read them; a second `terraform apply` is not required just to display or save output values.
 
 ```bash
 terraform output
@@ -1497,7 +1432,7 @@ The project exposes:
 
 These outputs help identify the deployed EC2 instance and its website address.
 
-#### Step 7.2: Check the EC2 instance state
+#### Step 6.2: Check the EC2 instance state
 
 ```bash
 aws ec2 describe-instances \
@@ -1509,7 +1444,7 @@ aws ec2 describe-instances \
 
 The deployed instance was verified as running.
 
-#### Step 7.3: Verify EC2 health checks
+#### Step 6.3: Verify EC2 health checks
 
 The instance was checked for:
 
@@ -1518,7 +1453,7 @@ The instance was checked for:
 
 Both health checks returned `ok`.
 
-#### Step 7.4: Test the website using curl
+#### Step 6.4: Test the website using curl
 
 Use the website URL returned by Terraform.
 
@@ -1539,7 +1474,7 @@ This confirms that the web server successfully responded to an HTTP request.
 
 ![Terraform deployed EC2 instance serving HTTP traffic](screenshots/4-18-terraform-deployed-ec2-instance-is-successfully-serving-http-traffic.png)
 
-#### Step 7.5: Retrieve the custom HTML page
+#### Step 6.5: Retrieve the custom HTML page
 
 ```bash
 curl http://<EC2-PUBLIC-IP>
@@ -1560,7 +1495,7 @@ The custom HTML page was successfully retrieved:
 </html>
 ```
 
-#### Step 7.6: Verify through a web browser
+#### Step 6.6: Verify through a web browser
 
 During the deployment, the website was opened at:
 
@@ -1597,13 +1532,13 @@ The custom NGINX homepage was displayed successfully.
 
 ---
 
-### Phase 8: Clean Up AWS Resources
+### Phase 7: Clean Up AWS Resources
 
 AWS resources can incur charges while they are running.
 
 When the lab is complete and the infrastructure is no longer required, review the Terraform destroy plan.
 
-#### Step 8.1: Review resources Terraform will destroy
+#### Step 7.1: Review resources Terraform will destroy
 
 ```bash
 terraform plan -destroy
@@ -1619,7 +1554,7 @@ Plan: 0 to add, 0 to change, 2 to destroy.
 
 This identified the two Terraform-managed resources intended for deletion: the EC2 instance and the dedicated security group.
 
-#### Step 8.2: Destroy the Terraform-managed resources
+#### Step 7.2: Destroy the Terraform-managed resources
 
 ```bash
 terraform destroy
@@ -1633,7 +1568,7 @@ The cleanup completed successfully:
 Destroy complete! Resources: 2 destroyed.
 ```
 
-#### Step 8.3: Verify Terraform state
+#### Step 7.3: Verify Terraform state
 
 ```bash
 terraform state list
@@ -1641,15 +1576,15 @@ terraform state list
 
 The state list was empty after cleanup.
 
-#### Step 8.4: Verify the EC2 instance
+#### Step 7.4: Verify the EC2 instance
 
 The EC2 instance was checked through AWS CLI and confirmed terminated.
 
-#### Step 8.5: Verify the security group
+#### Step 7.5: Verify the security group
 
 The dedicated lab security group was checked and confirmed deleted.
 
-#### Step 8.6: Confirm retained shared resources
+#### Step 7.6: Confirm retained shared resources
 
 The following resources were retained because they were existing shared resources and were not created by this Terraform project:
 
@@ -1671,7 +1606,7 @@ The EC2 root EBS volume was deleted through the instance's `delete_on_terminatio
 - Verify the AWS Region and active profile before cleanup.
 - Review AWS billing and other Regions/services separately; checking this project's resources does not prove that the entire AWS account has no billable resources.
 
-#### Step 8.7: Cleanup evidence
+#### Step 7.7: Cleanup evidence
 
 The cleanup screenshots document the following checks:
 
@@ -1738,8 +1673,6 @@ The cleanup screenshots document the following checks:
 - [x] Defined the EC2 instance and dedicated security group.
 - [x] Configured NGINX installation through EC2 user data.
 - [x] Reviewed and applied the Terraform deployment.
-- [x] Investigated the Terraform tainted-resource issue.
-- [x] Removed the tainted status after verifying the instance.
 - [x] Reviewed a fresh Terraform plan.
 - [x] Saved Terraform outputs.
 - [x] Verified the EC2 instance was running.
